@@ -166,6 +166,7 @@ export async function fetchUserPublicDecks(userId: string): Promise<Deck[]> {
     .eq('user_id', userId)
     .eq('is_private', false)
     .eq('is_archived', false)
+    .eq('show_on_profile', true)
     .order('created_at', { ascending: false });
 
   if (error || !data) return [];
