@@ -86,5 +86,6 @@ export interface User {
   name: string;
   tagline: string | null;
   profile_image_url: string | null;
+  cover_image_url: string | null;
   created_at: string;
 }

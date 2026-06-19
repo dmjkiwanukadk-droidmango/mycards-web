@@ -20,3 +20,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     },
   },
 });
+
+/**
+ * Admin Supabase client — uses the service_role key to bypass RLS.
+ * ONLY used server-side for signing private storage URLs (card-media bucket).
+ * The service role key is never exposed to the browser.
+ */
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+export const supabaseAdmin = supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false },
+      global: {
+        fetch: (url, options = {}) => {
+          return fetch(url, { ...options, cache: 'no-store' });
+        },
+      },
+    })
+  : null;

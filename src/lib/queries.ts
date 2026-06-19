@@ -1,5 +1,51 @@
-import { supabase } from './supabase';
+import { supabase, supabaseAdmin } from './supabase';
 import type { Deck, Card, CardBlock, User, DeckTheme } from './types';
+
+/**
+ * Re-sign expired card-media URLs for media blocks.
+ * card-media is a private Supabase Storage bucket, so signed URLs
+ * expire after 1 hour. This generates fresh 1-hour signed URLs
+ * for any image/video/audio block whose content.url points to card-media.
+ *
+ * Uses the admin (service_role) client to bypass RLS — the anon key
+ * cannot sign URLs for private buckets since there's no auth.uid().
+ */
+async function refreshBlockUrls(cards: Card[]): Promise<Card[]> {
+  // Need the admin client to sign private bucket URLs
+  const signer = supabaseAdmin ?? supabase;
+
+  const mediaTypes = new Set(['image', 'video', 'audio']);
+  const tasks: Array<{ block: CardBlock; storagePath: string }> = [];
+
+  for (const card of cards) {
+    for (const block of card.blocks) {
+      if (!mediaTypes.has(block.type)) continue;
+      const url: string = (block.content as any)?.url;
+      if (!url) continue;
+      // Extract storage path from a signed or raw card-media URL
+      const match = url.match(/card-media\/(.+?)(?:\?|$)/);
+      if (!match) continue;
+      tasks.push({ block, storagePath: match[1] });
+    }
+  }
+
+  if (tasks.length === 0) return cards;
+
+  // Batch-sign all paths in parallel
+  await Promise.all(
+    tasks.map(async ({ block, storagePath }) => {
+      const { data } = await signer.storage
+        .from('card-media')
+        .createSignedUrl(storagePath, 3600); // 1 hour
+
+      if (data?.signedUrl) {
+        block.content = { ...block.content, url: data.signedUrl } as any;
+      }
+    })
+  );
+
+  return cards;
+}
 
 /**
  * Fetch a public deck by ID with its owner info.
@@ -86,13 +132,16 @@ export async function fetchDeckCards(deckId: string): Promise<Card[]> {
   const positionMap = new Map(deckCards.map((dc) => [dc.card_id, dc.position]));
 
   // Combine and sort by deck position
-  return cards
+  const result = cards
     .map((card) => ({
       ...card,
       tone: card.tone as Card['tone'],
       blocks: blocksByCard.get(card.id) || [],
     }))
     .sort((a, b) => (positionMap.get(a.id) ?? 0) - (positionMap.get(b.id) ?? 0));
+
+  // Re-sign expired card-media URLs
+  return refreshBlockUrls(result);
 }
 
 /**
@@ -113,7 +162,7 @@ export async function fetchCard(cardId: string): Promise<Card | null> {
     .eq('card_id', cardId)
     .order('position');
 
-  return {
+  const result: Card = {
     ...card,
     tone: card.tone as Card['tone'],
     blocks: (blocks || []).map((b) => ({
@@ -124,6 +173,10 @@ export async function fetchCard(cardId: string): Promise<Card | null> {
       position: b.position,
     })),
   };
+
+  // Re-sign expired card-media URLs
+  const [refreshed] = await refreshBlockUrls([result]);
+  return refreshed;
 }
 
 /**
@@ -148,7 +201,7 @@ export async function fetchCardDeck(cardId: string): Promise<(Deck & { owner: Us
 export async function fetchUserByUsername(username: string): Promise<User | null> {
   const { data, error } = await supabase
     .from('users')
-    .select('id, username, name, tagline, profile_image_url, created_at')
+    .select('id, username, name, tagline, profile_image_url, cover_image_url, created_at')
     .eq('username', username.toLowerCase())
     .single();
 
