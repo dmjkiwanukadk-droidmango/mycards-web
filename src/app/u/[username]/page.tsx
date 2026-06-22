@@ -69,19 +69,21 @@ export default async function ProfilePage({ params }: Props) {
 
       {/* Profile header — centered, matching mobile app */}
       <header className="border-b border-gray-800 px-6 pb-8">
-        <div className="mx-auto flex max-w-2xl flex-col items-center text-center -mt-14">
-          {/* Avatar with purple ring */}
-          {user.profile_image_url ? (
-            <img
-              src={user.profile_image_url}
-              alt={user.name}
-              className="h-24 w-24 rounded-full border-[3px] border-[#6C3FC5] object-cover shadow-lg shadow-black/30"
-            />
-          ) : (
-            <div className="flex h-24 w-24 items-center justify-center rounded-full border-[3px] border-[#6C3FC5] bg-[#6C3FC5]/20 text-3xl font-bold text-[#6C3FC5] shadow-lg shadow-black/30">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+        <div className="mx-auto flex max-w-2xl flex-col items-center text-center -mt-16">
+          {/* Avatar with purple ring + dark backing ring for contrast against cover */}
+          <div className="rounded-full bg-gray-950 p-1">
+            {user.profile_image_url ? (
+              <img
+                src={user.profile_image_url}
+                alt={user.name}
+                className="h-24 w-24 rounded-full border-[3px] border-[#6C3FC5] object-cover shadow-lg shadow-black/40"
+              />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-full border-[3px] border-[#6C3FC5] bg-[#6C3FC5]/20 text-3xl font-bold text-[#6C3FC5] shadow-lg shadow-black/40">
+                {user.name.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
 
           {/* Name */}
           <h1 className="mt-4 text-2xl font-extrabold text-white">

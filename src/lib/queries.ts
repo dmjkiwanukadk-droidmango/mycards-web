@@ -220,7 +220,7 @@ export async function fetchUserPublicDecks(userId: string): Promise<Deck[]> {
     .eq('is_private', false)
     .eq('is_archived', false)
     .eq('show_on_profile', true)
-    .order('created_at', { ascending: false });
+    .order('profile_position', { ascending: true });
 
   if (error || !data) return [];
 
