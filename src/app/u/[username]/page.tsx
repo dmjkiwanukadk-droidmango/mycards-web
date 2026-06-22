@@ -71,7 +71,7 @@ export default async function ProfilePage({ params }: Props) {
       <header className="border-b border-gray-800 px-6 pb-8">
         <div className="mx-auto flex max-w-2xl flex-col items-center text-center -mt-16">
           {/* Avatar with purple ring + dark backing ring for contrast against cover */}
-          <div className="rounded-full bg-gray-950 p-1">
+          <div className="relative z-10 rounded-full bg-gray-950 p-1">
             {user.profile_image_url ? (
               <img
                 src={user.profile_image_url}
