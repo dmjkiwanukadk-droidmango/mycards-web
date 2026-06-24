@@ -54,36 +54,39 @@ export default async function DeckPage({ params }: Props) {
       className="min-h-screen pb-20"
       style={{ backgroundColor: style.tableBg }}
     >
-      {/* Header */}
-      <header
-        className="px-6 pb-8 pt-12"
-        style={{ backgroundColor: style.bg }}
-      >
-        <div className="mx-auto max-w-2xl">
-          {/* Owner info */}
+      <header className="relative overflow-hidden" style={{ backgroundColor: style.bg }}>
+        <div
+          className="h-1 w-full"
+          style={{ backgroundColor: style.accent }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `radial-gradient(ellipse 60% 80% at 50% 0%, ${style.accent}18 0%, transparent 70%)`,
+          }}
+        />
+        <div className="relative mx-auto max-w-2xl px-6 pb-8 pt-10">
           <Link
             href={`/u/${deck.owner.username}`}
-            className="mb-4 inline-flex items-center gap-3 transition-opacity hover:opacity-80"
+            className="mb-5 inline-flex items-center gap-3 transition-opacity hover:opacity-80"
           >
             {deck.owner.profile_image_url ? (
               <img
                 src={deck.owner.profile_image_url}
                 alt={deck.owner.name}
-                className="h-10 w-10 rounded-full object-cover"
+                className="h-10 w-10 rounded-full border object-cover"
+                style={{ borderColor: style.accent + '40' }}
               />
             ) : (
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold"
-                style={{ backgroundColor: style.accent + '30', color: style.accent }}
+                style={{ backgroundColor: style.accent + '25', color: style.accent }}
               >
                 {deck.owner.name.charAt(0).toUpperCase()}
               </div>
             )}
             <div>
-              <p
-                className="text-sm font-semibold"
-                style={{ color: style.text }}
-              >
+              <p className="text-sm font-semibold" style={{ color: style.text }}>
                 {deck.owner.name}
               </p>
               <p className="text-xs" style={{ color: style.subtext }}>
@@ -91,8 +94,6 @@ export default async function DeckPage({ params }: Props) {
               </p>
             </div>
           </Link>
-
-          {/* Deck info */}
           <h1
             className="mb-2 text-3xl font-extrabold tracking-tight"
             style={{ color: style.text }}
@@ -100,21 +101,33 @@ export default async function DeckPage({ params }: Props) {
             {deck.name}
           </h1>
           {deck.description && (
-            <p className="mb-4 text-base" style={{ color: style.subtext }}>
+            <p className="mb-4 text-base leading-relaxed" style={{ color: style.subtext }}>
               {deck.description}
             </p>
           )}
-          <p className="text-sm font-medium" style={{ color: style.accent }}>
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ backgroundColor: style.accent + '18', color: style.accent }}
+          >
             {cardCount} {cardCount === 1 ? 'card' : 'cards'}
-          </p>
+          </span>
         </div>
+        <div
+          className="h-px w-full"
+          style={{ backgroundColor: style.accent + '20' }}
+        />
       </header>
 
-      {/* Cards */}
       <section className="px-4 py-8">
         <div className="mx-auto max-w-2xl">
           {cards.length > 0 ? (
-            <CardList cards={cards} style={style} isLight={isLight} />
+            <CardList
+              cards={cards}
+              style={style}
+              isLight={isLight}
+              cardBack={(deck.theme.cardBack as any) || 'styleA'}
+              cardBackColor={deck.theme.cardBackColor}
+            />
           ) : (
             <div className="py-16 text-center">
               <p style={{ color: style.subtext }}>

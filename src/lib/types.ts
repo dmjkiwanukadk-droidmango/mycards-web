@@ -64,7 +64,8 @@ export interface DeckTheme {
   boxStyle?: string;
   color?: string;
   vibe?: string;
-  cardBack?: 'styleA' | 'styleB';
+  cardBack?: 'styleA' | 'styleB' | 'styleC' | 'styleD' | 'styleE' | 'styleF';
+  cardBackColor?: string;
   openAnimation?: 'tiltAndSlide' | 'slideOnly';
 }
 
