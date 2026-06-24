@@ -51,16 +51,16 @@ export function CardModal({ card, style, isLight, onClose }: CardModalProps) {
         style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
       />
 
-      {/* Modal panel — consistent height */}
+      {/* Modal panel */}
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative flex w-full max-w-lg animate-[slideUp_300ms_ease-out] flex-col overflow-hidden rounded-t-2xl sm:my-8 sm:rounded-2xl"
+        className="relative flex w-full max-w-lg animate-[slideUp_300ms_ease-out] flex-col overflow-hidden rounded-t-2xl sm:my-4 sm:rounded-2xl"
         style={{
           backgroundColor: style.cardBg,
           border: `1px solid ${style.accent}25`,
           boxShadow: '0 -8px 40px rgba(0,0,0,0.5)',
-          height: '70vh',
-          maxHeight: '70vh',
+          height: '85vh',
+          maxHeight: '85vh',
         }}
       >
         {/* Top accent stripe */}
@@ -69,7 +69,7 @@ export function CardModal({ card, style, isLight, onClose }: CardModalProps) {
           style={{ backgroundColor: style.accent }}
         />
 
-        {/* Header — fixed */}
+        {/* Header */}
         <div
           className="flex shrink-0 items-start justify-between gap-3 px-5 py-4 sm:px-6"
           style={{ borderBottom: `1px solid ${style.accent}15` }}
@@ -102,8 +102,8 @@ export function CardModal({ card, style, isLight, onClose }: CardModalProps) {
           </button>
         </div>
 
-        {/* Scrollable content — fills remaining space */}
-        <div className="flex-1 overflow-y-auto px-5 pb-8 pt-4 sm:px-6">
+        {/* Scrollable content */}
+        <div className="relative flex-1 overflow-y-auto px-5 pt-4 sm:px-6">
           {card.summary && (
             <p
               className="mb-5 text-sm leading-relaxed"
@@ -113,6 +113,20 @@ export function CardModal({ card, style, isLight, onClose }: CardModalProps) {
             </p>
           )}
           <CardContent blocks={card.blocks} style={style} />
+
+          {/* Scroll end spacer — lets users scroll past content to confirm end */}
+          <div className="pb-6 pt-10">
+            <div
+              className="mx-auto h-px w-16"
+              style={{ backgroundColor: style.accent + '20' }}
+            />
+            <p
+              className="mt-3 text-center text-xs"
+              style={{ color: style.subtext }}
+            >
+              End of card
+            </p>
+          </div>
         </div>
       </div>
 
